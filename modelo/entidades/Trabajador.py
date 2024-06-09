@@ -33,7 +33,7 @@ class Trabajador:
     
     def __str__(self):
         return f"""
-    Trabajador: {self._nombre} {self._apellido}
+    {self._tipo_usuario}: {self._nombre} {self._apellido}
     RUN: {self._run}-{self._rundf}
     Correo: {self._correo}
     Género: {self._genero}

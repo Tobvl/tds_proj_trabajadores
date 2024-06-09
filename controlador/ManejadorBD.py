@@ -9,20 +9,20 @@ from mysql.connector import pooling as pool
 # Clase conexión
 class Conexion:
     
-    
     # user = adminyury | pw = *
     dbconfig = {
-    "host": "localhost",
+    "host": "127.0.0.1",
     "user": "correoyury",
     "password": "correoyury@2024",
     "database": "correoyury",
+    # "user": "root",
+    # "password": "",
+    # "database": "correoyury",
     "port": "3306",
 }
     _NOMBRE_POOL = "pool"
     _MAXCON = 5
     _pool = None
-
-    
     
     @classmethod
     def getPool(cls):
@@ -85,7 +85,7 @@ try:
         nombre_usuario VARCHAR(100) NOT NULL, clave VARCHAR(255) NOT NULL, clave_salt VARCHAR(255) NOT NULL,\
         run INT NOT NULL, rundf VARCHAR(2) NOT NULL, nombre VARCHAR(100)  NOT NULL, apellido VARCHAR(100) NOT NULL,\
         correo VARCHAR(100), genero VARCHAR(20) NOT NULL, telefono VARCHAR(20) NOT NULL,\
-        direccion VARCHAR(100) NOT NULL, tipo_usuario VARCHAR(40) NOT NULL, datos_trabajador INT)",
+        direccion VARCHAR(100) NOT NULL, tipo_usuario VARCHAR(40) NOT NULL, datos_trabajador INT, fecha_ingreso TIMESTAMP)",
 
         "CREATE TABLE IF NOT EXISTS acceso (id_acceso INT AUTO_INCREMENT PRIMARY KEY,\
         nombre_usuario VARCHAR(100) NOT NULL, clave VARCHAR(255) NOT NULL,\

@@ -1,3 +1,5 @@
 colorama
 rich
-mysql
+bcrypt
+mysql-connector-python
+pwinput

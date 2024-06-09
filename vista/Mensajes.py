@@ -49,10 +49,11 @@ class Mensaje():
 
     def pregunta(self, pregunta):
         print(f"\n{VERDE}[?] {pregunta}")
-        return input(f"{separador}")
+        p=input(f"{separador}").strip()
+        return p 
     
     def pregunta_clave(self):
-        print(f"\n{AMARILLO}[?] Ingresa tu contraseña: {Style.RESET_ALL}")
+        print(f"\n{AMARILLO}[?] Ingresa tu contraseña: {Style.RESET_ALL}    [ENTER para salir]")
         return pwinput.pwinput(f"{separador}", mask="*")
     
     def opcion_invalida(self):
@@ -236,47 +237,65 @@ class Menu:
             Mensaje(ERROR, "El nombre de usuario ya existe, intente con otro...")
             nombre_usuario = Mensaje().pregunta("Nombre de usuario:       [0 para salir]")
         clave = Mensaje().pregunta_clave()
-        while clave == "":
-            Mensaje(ERROR, "La contraseña no puede estar vacía!.\n")
+        if clave == "":
+            Mensaje(INFO, "Saliendo del registro de usuario...")
+            esperar(0.5)
+            return
+        while len(clave) < 4:
+            Mensaje(ERROR, "La contraseña no cumple con los requisitos!.\n")
             esperar(1)
             clave = Mensaje().pregunta_clave()
+            if clave == "":
+                Mensaje(INFO, "Saliendo del registro de usuario...")
+                esperar(0.5)
+                return
             continue
-        run = Mensaje().pregunta("RUN:        [0 para salir]")
+        run = Mensaje().pregunta("RUN (Sin puntos ni dígito verificador):        [0 para salir]")
         if run == "0":
             Mensaje(INFO, "Saliendo del registro de usuario...")
             esperar(0.5)
             return
-        rundf = Mensaje().pregunta("RUN (Dígito verificador):         [0 para salir]")
-        if rundf == "0":
+        rundf = Mensaje().pregunta("Dígito verificador RUN:         [ENTER para salir]")
+        if rundf == "":
             Mensaje(INFO, "Saliendo del registro de usuario...")
             esperar(0.5)
             return
-        nombre = Mensaje().pregunta("Nombre:          [0 para salir]")
+        nombre = Mensaje().pregunta("Nombres:          [0 para salir]")
         if nombre == "0":
             Mensaje(INFO, "Saliendo del registro de usuario...")
             esperar(0.5)
             return
-        apellido = Mensaje().pregunta("Apellido:          [0 para salir]")
+        apellido = Mensaje().pregunta("Apellidos:          [0 para salir]")
         if apellido == "0":
             Mensaje(INFO, "Saliendo del registro de usuario...")
             esperar(0.5)
             return
-        correo = Mensaje().pregunta("Correo:          [0 para salir]")
+        correo = Mensaje().pregunta("Correo Electrónico:          [0 para salir]")
         if correo == "0":
             Mensaje(INFO, "Saliendo del registro de usuario...")
             esperar(0.5)
             return
-        genero = Mensaje().pregunta("Género:          [0 para salir]")
+        genero = Mensaje().pregunta("""Género:          [0 para salir]
+        1. Masculino
+        2. Femenino
+        3. Otro""")
         if genero == "0":
             Mensaje(INFO, "Saliendo del registro de usuario...")
             esperar(0.5)
             return
+        if genero == "1":
+            genero = "Masculino"
+        elif genero == "2":
+            genero = "Femenino"
+        elif genero == "3":
+            genero = "Otro"
+
         telefono = Mensaje().pregunta("Teléfono:          [0 para salir]")
         if telefono == "0":
             Mensaje(INFO, "Saliendo del registro de usuario...")
             esperar(0.5)
             return
-        direccion = Mensaje().pregunta("Dirección:        [0 para salir]")
+        direccion = Mensaje().pregunta("Dirección Completa:        [0 para salir]")
         if direccion == "0":
             Mensaje(INFO, "Saliendo del registro de usuario...")
             esperar(0.5)
@@ -322,7 +341,7 @@ class Menu:
                     # Volver al login
                     return
                 except Exception as e:
-                    Mensaje(ERROR, f"Error al registrar {tipo_usuario}: {e}")
+                    Mensaje(ERROR, f"Error al registrar un nuevo usuario {tipo_usuario}: {e}")
                     esperar(1)
                     return
             elif confirmar == "2":

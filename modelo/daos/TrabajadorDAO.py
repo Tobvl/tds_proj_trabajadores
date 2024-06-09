@@ -127,8 +127,7 @@ class TrabajadorDAO:
                 manager.execute(cls._INSERT, values)
                 return manager.rowcount
         except Exception as e:
-            print(e)
-            return 0
+            raise e
     
     
 if __name__ == "__main__":
