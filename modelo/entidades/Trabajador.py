@@ -15,7 +15,8 @@ class Trabajador:
                  direccion=None,
                  tipo_usuario=None,
                  datos_trabajador=None,
-                 fecha_ingreso=None):
+                 fecha_ingreso=None,
+                 modificacion_bloqueada=None):
         self._id_usuario = id_usuario
         self._nombre_usuario = nombre_usuario
         self._clave = clave
@@ -30,16 +31,20 @@ class Trabajador:
         self._tipo_usuario = tipo_usuario
         self._datos_trabajador = datos_trabajador
         self._fecha_ingreso = fecha_ingreso
+        self._modificacion_bloqueada = modificacion_bloqueada
     
     def __str__(self):
         return f"""
-    {self._tipo_usuario}: {self._nombre} {self._apellido}
+    Nombre: {self._nombre} {self._apellido}
+    Usuario: {self._nombre_usuario}
     RUN: {self._run}-{self._rundf}
     Correo: {self._correo}
     Género: {self._genero}
     Teléfono: {self._telefono}
     Dirección: {self._direccion}
+    Fecha de Registro: {self._fecha_ingreso}
     Tipo de Usuario: {self._tipo_usuario}
+    Puede modificar su ficha: {'Si' if self._modificacion_bloqueada == 0 else 'No'}
     """
     
     @property
@@ -97,6 +102,10 @@ class Trabajador:
     @property
     def fecha_ingreso(self):
         return self._fecha_ingreso
+
+    @property
+    def modificacion_bloqueada(self):
+        return self._modificacion_bloqueada
     
     
     @id_usuario.setter
@@ -124,7 +133,7 @@ class Trabajador:
         self._nombre = nombre
 
     @apellido.setter
-    def id_usuario(self, apellido):
+    def apellido(self, apellido):
         self._apellido = apellido
 
     @correo.setter
@@ -154,3 +163,7 @@ class Trabajador:
     @fecha_ingreso.setter
     def fecha_ingreso(self, fecha_ingreso):
         self._fecha_ingreso = fecha_ingreso
+        
+    @modificacion_bloqueada.setter
+    def modificacion_bloqueada(self, modificacion_bloqueada):
+        self._modificacion_bloqueada = modificacion_bloqueada

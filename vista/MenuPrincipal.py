@@ -22,10 +22,6 @@ def menuPrincipal():
             menu.menuInicioSesion()
             
         elif pregunta == "2":
-            # Registro de Usuario
-            menu.menuRegistro()
-            
-        elif pregunta == "3":
             # Salir
             msj("Hasta la próxima!")
             break

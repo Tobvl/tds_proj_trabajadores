@@ -2,10 +2,12 @@
 
 # Importamos las librerías necesarias
 import sys
-import mysql.connector as conector
 from mysql.connector import pooling as pool
 
-
+from colorama import Fore, Style
+AMARILLO = f"{Fore.YELLOW}"
+separador = f"{AMARILLO} >>{Style.RESET_ALL} "
+ERROR = f"{Fore.RED}ERROR{separador}{Fore.LIGHTRED_EX}"
 # Clase conexión
 class Conexion:
     
@@ -31,7 +33,7 @@ class Conexion:
                 cls._pool = pool.MySQLConnectionPool(pool_name = cls._NOMBRE_POOL,
                                                     pool_size = cls._MAXCON,
                                                     **cls.dbconfig)
-                print('Pool creada exitosamente')
+                # print('Pool creada exitosamente')
                 return cls._pool
             except Exception as e:
                 print(f'Error mientras se creaba la pool de la base de datos: {e}')
@@ -66,7 +68,8 @@ class manejadorBD:
     def __exit__(self, e_type, e_value, e_detail):
         if e_value:
             self._conexion.rollback()
-            print(f'Ocurrió una excepción: {e_value}')
+            print("Ocurrió un error! Por favor, contacte al administrador.", e_value)
+            return
         else:
             self._conexion.commit()
         self._manager.close()
@@ -79,24 +82,26 @@ try:
     CREATE_TABLES = [
         # Tabla de trabajador
         # id_usuario, nombre_usuario, clave, clave_salt, run, rundf, nombre
-        # apellido, correo, genero, telefono, direccion, tipo_usuario
+        # apellido, correo, genero, telefono, direccion, tipo_usuario,
+        # datos_trabajador, fecha_ingreso, modificacion_bloqueada
         # 
         "CREATE TABLE IF NOT EXISTS trabajador (id_usuario INT AUTO_INCREMENT PRIMARY KEY,\
         nombre_usuario VARCHAR(100) NOT NULL, clave VARCHAR(255) NOT NULL, clave_salt VARCHAR(255) NOT NULL,\
         run INT NOT NULL, rundf VARCHAR(2) NOT NULL, nombre VARCHAR(100)  NOT NULL, apellido VARCHAR(100) NOT NULL,\
         correo VARCHAR(100), genero VARCHAR(20) NOT NULL, telefono VARCHAR(20) NOT NULL,\
-        direccion VARCHAR(100) NOT NULL, tipo_usuario VARCHAR(40) NOT NULL, datos_trabajador INT, fecha_ingreso TIMESTAMP)",
+        direccion VARCHAR(100) NOT NULL, tipo_usuario VARCHAR(40) NOT NULL, datos_trabajador INT, fecha_ingreso TIMESTAMP, \
+        modificacion_bloqueada BOOLEAN DEFAULT FALSE)",
 
         "CREATE TABLE IF NOT EXISTS acceso (id_acceso INT AUTO_INCREMENT PRIMARY KEY,\
         nombre_usuario VARCHAR(100) NOT NULL, clave VARCHAR(255) NOT NULL,\
         fecha_acceso TIMESTAMP)"
     ]
     with manejadorBD() as manager:
-        print("Inicializando conexión a la base de datos...")
+        # print("Inicializando conexión a la base de datos...")
         manager.execute(CREATE_TABLES[0])
         manager.execute(CREATE_TABLES[1])
 except Exception as e:
-    print("Error al inicializar la base de datos:", e)
+    print("Error al inicializar la base de datos:")
 
 
 # hacer select de correoyury y mostrar los datos

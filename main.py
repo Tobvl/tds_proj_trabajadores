@@ -9,5 +9,7 @@ from vista.MenuPrincipal import menuPrincipal
 import sys
 sys.path.append("..")
 sys.path.append(".")
+
 # Llamar a la función principal de la aplicación
 menuPrincipal()
+

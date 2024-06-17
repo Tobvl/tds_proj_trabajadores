@@ -1,6 +1,5 @@
 from controlador.ManejadorBD import manejadorBD
 from modelo.entidades.Trabajador import Trabajador
-from time import sleep as esperar
 import bcrypt, os
 
 
@@ -26,7 +25,8 @@ class TrabajadorDAO:
     
     """
     _SELECT = 'SELECT * FROM trabajador'
-    _SELECTID = 'SELECT * FROM trabajador WHERE id_trabajador=%s'
+    _SELECTID = 'SELECT * FROM trabajador WHERE id_usuario=%s'
+    _SELECT_USERNAME = 'SELECT * FROM trabajador WHERE nombre_usuario=%s'
     _INSERT = 'INSERT INTO trabajador (nombre_usuario,\
         clave,\
         clave_salt,\
@@ -39,9 +39,57 @@ class TrabajadorDAO:
         telefono,\
         direccion,\
         tipo_usuario, \
-        fecha_ingreso) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, NOW())'
-    _UPDATE = 'UPDATE trabajador SET id_usuario=%s, id_datos_trabajador=%s WHERE id_trabajador=%s'
-    _DELETE = 'DELETE FROM trabajador WHERE id_trabajador=%s'
+        fecha_ingreso, \
+        modificacion_bloqueada) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, NOW(), FALSE)'
+    _UPDATE = 'UPDATE trabajador SET %s=%s WHERE id_usuario=%s'
+    _UPDATE_NOMBRE = 'UPDATE trabajador SET nombre=%s WHERE id_usuario=%s'
+    _UPDATE_APELLIDO = 'UPDATE trabajador SET apellido=%s WHERE id_usuario=%s'
+    _UPDATE_CORREO = 'UPDATE trabajador SET correo=%s WHERE id_usuario=%s'
+    _UPDATE_GENERO = 'UPDATE trabajador SET genero=%s WHERE id_usuario=%s'
+    _UPDATE_TELEFONO = 'UPDATE trabajador SET telefono=%s WHERE id_usuario=%s'
+    _UPDATE_DIRECCION = 'UPDATE trabajador SET direccion=%s WHERE id_usuario=%s'
+    _UPDATE_RUN_RUN = 'UPDATE trabajador SET run=%s WHERE id_usuario=%s'
+    _UPDATE_RUN_DF = 'UPDATE trabajador SET rundf=%s WHERE id_usuario=%s'
+    _DELETE = 'DELETE FROM trabajador WHERE id_usuario=%s'
+
+    _DARBAJA_DELETE = 'DELETE FROM trabajador WHERE id_usuario=%s'
+    _DARBAJA_INSERT = 'INSERT INTO trabajadores_baja (id_usuario, \
+        nombre_usuario,\
+        clave,\
+        clave_salt,\
+        run,\
+        rundf,\
+        nombre,\
+        apellido,\
+        correo,\
+        genero,\
+        telefono,\
+        direccion,\
+        tipo_usuario, \
+        datos_trabajador, \
+        fecha_ingreso, \
+        modificacion_bloqueada, \
+        activo, \
+        fecha_baja, \
+        administrativo_baja) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, 0, NOW(), %s)'
+    
+    @classmethod
+    def dar_baja(cls, trabajador, administrativo):
+        try:
+            with manejadorBD() as manager:
+                print("obteniendo trabajador a dar de baja")
+                manager.execute(cls._SELECTID, (trabajador.id_usuario,))
+                trabajador_values = list(manager.fetchone()) 
+            print(trabajador_values)
+            insert_values = trabajador_values + [administrativo.nombre_usuario]
+            print(insert_values)
+            with manejadorBD() as manager:
+                manager.execute(cls._DARBAJA_INSERT, insert_values)
+            
+            print("Trabajador dado de baja exitosamente")
+            
+        except Exception as e:
+            raise e
     
     @classmethod
     def validar_usuario(cls, nombre_usuario, clave):
@@ -67,7 +115,8 @@ class TrabajadorDAO:
                             direccion=usuario[11],
                             tipo_usuario=usuario[12],
                             datos_trabajador=usuario[13],
-                            fecha_ingreso=usuario[14]
+                            fecha_ingreso=usuario[14],
+                            modificacion_bloqueada=usuario[15],
                         )
                         return (True, objetoUsuario)
             return (False)
@@ -100,7 +149,19 @@ class TrabajadorDAO:
             data = manager.fetchall()
             lista_trabajadores = []
             for trabajador in data:
-                new_trabajador = Trabajador(**trabajador)
+                new_trabajador = Trabajador(nombre_usuario=trabajador[1],
+                                            run=trabajador[4],
+                                            rundf=trabajador[5],
+                                            nombre=trabajador[6],
+                                            apellido=trabajador[7],
+                                            correo=trabajador[8],
+                                            genero=trabajador[9],
+                                            telefono=trabajador[10],
+                                            direccion=trabajador[11],
+                                            tipo_usuario=trabajador[12],
+                                            datos_trabajador=trabajador[13],
+                                            fecha_ingreso=trabajador[14],
+                                            modificacion_bloqueada=trabajador[15])
                 lista_trabajadores.append(new_trabajador)
             return lista_trabajadores
     
@@ -129,6 +190,112 @@ class TrabajadorDAO:
         except Exception as e:
             raise e
     
+    @classmethod
+    def update(cls, trabajador):
+        pass
+
+    @classmethod
+    def get(cls, nombre_usuario) -> Trabajador:
+        try:
+            with manejadorBD() as manager:
+                manager.execute(cls._SELECT_USERNAME, (nombre_usuario,))
+                data = manager.fetchone()
+                if data:
+                    trabajador = Trabajador(id_usuario=data[0],
+                                            nombre_usuario=data[1],
+                                            clave=data[2],
+                                            run=data[4],
+                                            rundf=data[5],
+                                            nombre=data[6],
+                                            apellido=data[7],
+                                            correo=data[8],
+                                            genero=data[9],
+                                            telefono=data[10],
+                                            direccion=data[11],
+                                            tipo_usuario=data[12],
+                                            datos_trabajador=data[13],
+                                            fecha_ingreso=data[14],
+                                            modificacion_bloqueada=data[15])
+                    return trabajador
+                else:
+                    return None
+        except Exception as e:
+            raise e
+
+    @classmethod
+    def get_id_by_username(cls, nombre_usuario):
+        try:
+            with manejadorBD() as manager:
+                manager.execute(cls._SELECT_USERNAME, (nombre_usuario,))
+                data = manager.fetchone()
+                if data:
+                    return data[0]
+                else:
+                    return None
+        except Exception as e:
+            raise e
+    
+    @classmethod
+    def modificar_nombre(cls, usuario, nuevo_nombre, nuevo_apellido):
+        try:
+            with manejadorBD() as manager:
+                manager.execute(cls._UPDATE_NOMBRE, (nuevo_nombre, int(usuario.id_usuario)))
+                manager.execute(cls._UPDATE_APELLIDO, (nuevo_apellido, int(usuario.id_usuario)))
+                # print("Nombre y apellido modificado exitosamente")
+                return manager.rowcount
+        except Exception as e:
+            raise e
+        
+    @classmethod
+    def modificar_correo(cls, usuario, nuevo_correo):
+        try:
+            with manejadorBD() as manager:
+                manager.execute(cls._UPDATE_CORREO, (nuevo_correo, int(usuario.id_usuario)))
+                # print("Correo modificado exitosamente")
+                return manager.rowcount
+        except Exception as e:
+            raise e
+        
+    @classmethod
+    def modificar_telefono(cls, usuario, nuevo_telefono):
+        try:
+            with manejadorBD() as manager:
+                manager.execute(cls._UPDATE_TELEFONO, (nuevo_telefono, int(usuario.id_usuario)))
+                # print("Teléfono modificado exitosamente")
+                return manager.rowcount
+        except Exception as e:
+            raise e
+        
+    @classmethod
+    def modificar_genero(cls, usuario, nuevo_genero):
+        try:
+            with manejadorBD() as manager:
+                manager.execute(cls._UPDATE_GENERO, (nuevo_genero, int(usuario.id_usuario)))
+                # print("Género modificado exitosamente")
+                return manager.rowcount
+        except Exception as e:
+            raise e
+        
+    @classmethod
+    def modificar_run(cls, usuario, nuevo_run, nuevo_df):
+        try:
+            with manejadorBD() as manager:
+                manager.execute(cls._UPDATE_RUN_RUN, (nuevo_run, int(usuario.id_usuario)))
+                manager.execute(cls._UPDATE_RUN_DF, (nuevo_df, int(usuario.id_usuario)))
+                # print("RUN y DF modificado exitosamente")
+                return manager.rowcount
+        except Exception as e:
+            raise e
+        
+    @classmethod
+    def modificar_direccion(cls, usuario, nueva_direccion):
+        try:
+            with manejadorBD() as manager:
+                manager.execute(cls._UPDATE_DIRECCION, (nueva_direccion, int(usuario.id_usuario)))
+                # print("Dirección modificada exitosamente!")
+                return manager.rowcount
+        except Exception as e:
+            raise e
     
 if __name__ == "__main__":
     trabajadores = TrabajadorDAO.list()
