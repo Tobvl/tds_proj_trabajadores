@@ -81,7 +81,7 @@ def modificando5s(mensaje, campo):
         f"""
         {VERDE}{mensaje}:
         """)
-            for _ in track(range(random.randrange(250, 1500, 1)), description=f"        {VERDE_CLARO}{campo}..."):
+            for _ in track(range(random.randrange(250, 1500, 1)), description=f"        {VERDE_CLARO}{campo}...\n"):
                 esperar(0.0011)
 
 def registrando(mensaje):
@@ -405,11 +405,11 @@ class MenuInterno:
                 Mensaje()
                 pregunta = Mensaje(msj).pregunta("Escoge una opción: ")
                 if pregunta == "1":
-                    lista_trabajadores = TrabajadorDAO.list()
-                    esperar(1)
-                    for trabajador in lista_trabajadores:
-                        print(trabajador)
-                    esperar(2)
+
+                    orden = {}
+                    filtros = {}
+                    
+                    self.menuListaTrabajadores(orden, filtros)
                 elif pregunta == "2":
                     # Ingresar nuevo trabajador
                     Menu.menuRegistro()
@@ -436,7 +436,7 @@ class MenuInterno:
                         return
                 elif pregunta == "4":
                     # Lista de trabajadores dados de baja
-                    pass
+                    self.listarTrabajadoresBaja()
                 elif pregunta == "5":
                     # Dar de baja a un trabajador
                     if usuario.tipo_usuario != "Jefe":
@@ -452,8 +452,200 @@ class MenuInterno:
                     Mensaje(ADVERTENCIA, "Opción no válida, intente de nuevo...")
                     esperar(0.5)
                     continue
-
+    
+    @classmethod
+    def menuListaTrabajadores(self, orden, filtros):
+        
+        
+        while True:
+            if orden.keys():
+                valores_ordenados = ', '.join([f"{VERDE}{k}{AMARILLO}:{VERDE_CLARO}{v}" for k, v in orden.items()])
+            if filtros.keys():
+                valores_filtrados = ', '.join([f"{k} {v}" for k, v in filtros.items()])
             
+            if not orden:
+                valores_ordenados = 'Sin ordenar'
+            if not filtros:
+                valores_filtrados = 'Sin filtrar'
+            ordenmsj = \
+        f"""{CIAN}Orden: {AMARILLO}{valores_ordenados}"""
+            filtromsj = \
+        f"""{CIAN}Filtros: {AMARILLO}{valores_filtrados}"""
+    
+            Mensaje(f"""
+    {VERDE}Menú Lista de trabajadores
+    {ordenmsj}
+    {filtromsj}
+    {VERDE_CLARO}1. {AMARILLO}Mostrar todos los trabajadores
+    {VERDE_CLARO}2. {AMARILLO}Ordenar lista
+    {VERDE_CLARO}3. {AMARILLO}Filtrar los trabajadores
+    {VERDE_CLARO}4. {AMARILLO}Quitar filtros y orden
+    {VERDE_CLARO}0. {AMARILLO}Volver atrás""")
+
+            pregunta = Mensaje().pregunta("Escoge una opción: ")
+            if pregunta == "1":
+                #mostrar todos los trabajadores.
+                trabajadores = TrabajadorDAO.list()
+                # TODO.. APLICAR FILTROS Y ORDEN
+                if not filtros and not orden:
+                    for trabajador in trabajadores:
+                        print(trabajador)
+                elif filtros and not orden:
+                    #! aplicar filtros sin orden y mostrar
+                    print("Aplicando filtros sin ordenar...")
+                    self.imprimirTrabajadoresOF(trabajadores, filtros=filtros)
+                elif orden and not filtros:
+                    #! aplicar orden sin filtros y mostrar
+                    print("Aplicando orden sin filtrar...")
+                    print(orden)
+                    self.imprimirTrabajadoresOF(trabajadores, orden=orden)
+                    ...
+                    
+                elif orden and filtros:
+                    #! aplicar orden, filtros y mostrar
+                    print("Aplicando orden y filtros...")
+                    self.imprimirTrabajadoresOF(trabajadores, orden=orden, filtros=filtros)
+                    ...
+                
+            elif pregunta == "2":
+                # preguntar si quiere ordenar la lista de los trabajadores.
+                # ordenar por nombre, fecha_ingreso, etc...
+
+                while True:
+                    ordenar_por = Mensaje().pregunta(f"""
+    {VERDE_CLARO}Ordenar por:
+    {VERDE_CLARO}1. {AMARILLO}Nombre
+    {VERDE_CLARO}2. {AMARILLO}Fecha de ingreso
+    {VERDE_CLARO}3. {AMARILLO}Genero
+    {VERDE_CLARO}0. {AMARILLO}Volver atrás""")
+                    if ordenar_por == "1": #ordenar por nombre
+                        tipo_orden = Mensaje().pregunta(f"""
+    {VERDE_CLARO}Ordenar por nombre:
+    {VERDE_CLARO}1. {AMARILLO}Nombre Ascendente
+    {VERDE_CLARO}2. {AMARILLO}Nombre Descendente
+    {VERDE_CLARO}0. {AMARILLO}Volver atrás""")
+                        if tipo_orden == "1":
+                            orden["nombre"] = "ASC"
+                        elif tipo_orden == "2":
+                            orden["nombre"] = "DESC"
+                        elif tipo_orden == "0":
+                            Mensaje(INFO, "Volviendo atrás...")
+                            esperar(0.5)
+                            break
+                        else:
+                            Mensaje(ADVERTENCIA, "Opción no válida, intente de nuevo...")
+                            esperar(0.5)
+                            continue
+                    elif ordenar_por == "2": #ordenar por fecha de ingreso
+                        tipo_orden = Mensaje().pregunta(f"""
+    {VERDE_CLARO}Ordenar por fecha de ingreso:
+    {VERDE_CLARO}1. {AMARILLO}Fecha más reciente primero
+    {VERDE_CLARO}2. {AMARILLO}Fecha más antigua primero
+    {VERDE_CLARO}0. {AMARILLO}Volver atrás""")
+                        if tipo_orden == "1":
+                            orden["fecha_ingreso"] = "RECIENTE"
+                        elif tipo_orden == "2":
+                            orden["fecha_ingreso"] = "ANTIGUA"
+                        elif tipo_orden == "0":
+                            Mensaje(INFO, "Volviendo atrás...")
+                            esperar(0.5)
+                            break
+                        else:
+                            Mensaje(ADVERTENCIA, "Opción no válida, intente de nuevo...")
+                            esperar(0.5)
+                            continue
+                    elif ordenar_por == "3": #ordenar por genero
+                        tipo_orden = Mensaje().pregunta(f"""
+    {VERDE_CLARO}Ordenar por género:
+    {VERDE_CLARO}1. {AMARILLO}Masculinos primero
+    {VERDE_CLARO}2. {AMARILLO}Femeninos primero
+    {VERDE_CLARO}0. {AMARILLO}Volver atrás""")
+                        if tipo_orden == "1":
+                            orden["genero"] = "M"
+                        elif tipo_orden == "2":
+                            orden["genero"] = "F"
+                        elif tipo_orden == "0":
+                            Mensaje(INFO, "Volviendo atrás...")
+                            esperar(0.5)
+                            break
+                        else:
+                            Mensaje(ADVERTENCIA, "Opción no válida, intente de nuevo...")
+                            esperar(0.5)
+                            continue
+                    elif ordenar_por == "0":
+                        Mensaje(INFO, "Volviendo atrás...")
+                        esperar(0.5)
+                        break
+                    else:
+                        Mensaje(ADVERTENCIA, "Opción no válida, intente de nuevo...")
+                        esperar(0.5)
+                        continue
+            elif pregunta == "3":
+                # preguntar por filtro de los trabajadores
+                # filtrar por nombre, apellido, fecha_ingreso, etc...
+                ...
+            elif pregunta == "4":
+                # quitar filtros y orden
+                orden = {}
+                filtros = {}
+                Mensaje(EXITO, "Se han eliminado los filtros y el orden de la lista de trabajadores.")
+                continue
+            elif pregunta == "0":
+                Mensaje(INFO, "Volviendo atrás...")
+                return (orden, filtros)
+
+            else:
+                Mensaje(ADVERTENCIA, "Opción no válida, intente de nuevo...")
+                esperar(0.5)
+                continue
+
+    @classmethod
+    def imprimirTrabajadoresOF(self, lista_trabajadores, orden=None, filtros=None):
+
+        claves_orden = orden
+        
+        for clave in claves_orden:
+            direccion = claves_orden[clave]
+            if direccion == "ASC":
+                lista_trabajadores.sort(key= lambda trabajador: getattr(trabajador, clave).lower())
+            elif direccion == "DESC":
+                lista_trabajadores.sort(key= lambda trabajador: getattr(trabajador, clave).lower(), reverse=True)
+            elif direccion == "RECIENTE":
+                lista_trabajadores.sort(key= lambda trabajador: getattr(trabajador, clave), reverse=True)
+            elif direccion == "ANTIGUA":
+                lista_trabajadores.sort(key= lambda trabajador: getattr(trabajador, clave))
+            elif direccion == "M":
+                lista_trabajadores.sort(key= lambda trabajador: getattr(trabajador, clave).lower())
+            elif direccion == "F":
+                lista_trabajadores.sort(key= lambda trabajador: getattr(trabajador, clave).lower(), reverse=True)
+            
+        # if orden.keys()>0:
+        #     if "nombre" in orden.keys():
+        #         print("Ordenando por nombre")
+        #         lista_trabajadores = sorted(lista_trabajadores, key=lambda x: x.nombre, reverse=True if orden["nombre"] == "DESC" else False)
+        #     if "fecha_ingreso" in orden.keys():
+        #         lista_trabajadores = sorted(lista_trabajadores, key=lambda x: x.fecha_ingreso, reverse=True if orden["fecha_ingreso"] == "ANTIGUA" else False)
+        #     if "genero" in orden.keys():
+        #         lista_trabajadores = sorted(lista_trabajadores, key=lambda x: x.genero, reverse=True if orden["genero"] == "F" else False)
+        # if filtros.keys()>0:
+        #     if "nombre" in filtros.keys():
+        #         lista_trabajadores = [x for x in lista_trabajadores if filtros["nombre"].lower() in x.nombre.lower()]
+        #     if "fecha_ingreso" in filtros.keys():
+        #         lista_trabajadores = [x for x in lista_trabajadores if filtros["fecha_ingreso"] == x.fecha_ingreso]
+        #     if "genero" in filtros.keys():
+        #         lista_trabajadores = [x for x in lista_trabajadores if filtros["genero"] == x.genero]
+        for trabajador in lista_trabajadores:
+            print(trabajador)
+        return lista_trabajadores
+            
+    @classmethod
+    def listarTrabajadoresBaja(self):
+        lista_trabajadores = TrabajadorDAO.list_baja()
+        esperar(1)
+        for trabajador in lista_trabajadores:
+            print(trabajador)
+        esperar(2)
+        
     @classmethod
     def menuModificarCampoTrabajador(self, campo, trabajador: Trabajador):
         if campo == "1":

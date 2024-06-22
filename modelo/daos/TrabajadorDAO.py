@@ -25,6 +25,7 @@ class TrabajadorDAO:
     
     """
     _SELECT = 'SELECT * FROM trabajador'
+    _SELECT_BAJA = 'SELECT * FROM trabajadores_baja'
     _SELECTID = 'SELECT * FROM trabajador WHERE id_usuario=%s'
     _SELECT_USERNAME = 'SELECT * FROM trabajador WHERE nombre_usuario=%s'
     _INSERT = 'INSERT INTO trabajador (nombre_usuario,\
@@ -84,7 +85,12 @@ class TrabajadorDAO:
             insert_values = trabajador_values + [administrativo.nombre_usuario]
             print(insert_values)
             with manejadorBD() as manager:
+                print("Insertando dada de baja")
+                print(insert_values)
                 manager.execute(cls._DARBAJA_INSERT, insert_values)
+                print("Eliminando trabajador de tabla trabajador $$:")
+                print(trabajador_values[0])
+                manager.execute(cls._DARBAJA_DELETE, (trabajador_values[0],))
             
             print("Trabajador dado de baja exitosamente")
             
@@ -141,11 +147,33 @@ class TrabajadorDAO:
                     return trabajador[12]
             return None
     
-    
     @classmethod
     def list(cls):
         with manejadorBD() as manager:
             manager.execute(cls._SELECT)
+            data = manager.fetchall()
+            lista_trabajadores = []
+            for trabajador in data:
+                new_trabajador = Trabajador(nombre_usuario=trabajador[1],
+                                            run=trabajador[4],
+                                            rundf=trabajador[5],
+                                            nombre=trabajador[6],
+                                            apellido=trabajador[7],
+                                            correo=trabajador[8],
+                                            genero=trabajador[9],
+                                            telefono=trabajador[10],
+                                            direccion=trabajador[11],
+                                            tipo_usuario=trabajador[12],
+                                            datos_trabajador=trabajador[13],
+                                            fecha_ingreso=trabajador[14],
+                                            modificacion_bloqueada=trabajador[15])
+                lista_trabajadores.append(new_trabajador)
+            return lista_trabajadores
+    
+    @classmethod
+    def list_baja(cls):
+        with manejadorBD() as manager:
+            manager.execute(cls._SELECT_BAJA)
             data = manager.fetchall()
             lista_trabajadores = []
             for trabajador in data:
