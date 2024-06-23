@@ -15,7 +15,7 @@ El nombre de archivo, el nombre de directorio o la sintaxis de la etiqueta del v
 1. Clonar el repositorio
 
 ```
-git clone [https://github.com/Tobvl/tds_proj_trabajadores.git](https://github.com/Tobvl/tds_proj_trabajadores.git)
+git clone https://github.com/Tobvl/tds_proj_trabajadores.git
 ```
 
 2. Ingresar al directorio del proyecto
