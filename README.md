@@ -7,9 +7,9 @@ La empresa “El correo de Yury” esta comenzando a entrar al mercado, y se ha 
 El nombre de archivo, el nombre de directorio o la sintaxis de la etiqueta del volumen no son correctos.
 
 ## Requisitos
-- Python 3.8+
-- Docker compose
-- Git
+- [Python 3.8+](https://www.python.org/downloads/)
+- [Docker compose](https://docs.docker.com/engine/install/) 
+- [Git](https://git-scm.com/downloads)
 
 ## Modo de uso
 1. Clonar el repositorio
