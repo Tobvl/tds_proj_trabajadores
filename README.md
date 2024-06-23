@@ -33,7 +33,7 @@ pip install -r requiremientos.txt
 4. Levantar base de datos
 
 ```
-docker-compose up -d
+docker compose up -d
 ```
 
 5. Ejecutar el proyecto
