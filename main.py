@@ -1,3 +1,4 @@
+# coding: utf8
 # Main
 # Llamar a la función principal de la aplicación (vista)
 

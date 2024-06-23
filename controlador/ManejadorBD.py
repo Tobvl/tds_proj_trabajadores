@@ -11,15 +11,11 @@ ERROR = f"{Fore.RED}ERROR{separador}{Fore.LIGHTRED_EX}"
 # Clase conexión
 class Conexion:
     
-    # user = adminyury | pw = *
     dbconfig = {
     "host": "127.0.0.1",
     "user": "correoyury",
     "password": "correoyury@2024",
     "database": "correoyury",
-    # "user": "root",
-    # "password": "",
-    # "database": "correoyury",
     "port": "3306",
 }
     _NOMBRE_POOL = "pool"
@@ -103,16 +99,3 @@ try:
 except Exception as e:
     print("Error al inicializar la base de datos:")
 
-
-# hacer select de correoyury y mostrar los datos
-# conn = Conexion.getPool().get_connection()
-# cursor = conn.cursor()
-# cursor.execute("SELECT * FROM correoyury")
-# for row in cursor:
-#     print(row)
-    
-if __name__ == '__main__':
-    with manejadorBD() as manager:
-        print('inside with block')
-        manager.execute('SELECT * FROM correoyury')
-        print(manager.fetchall())

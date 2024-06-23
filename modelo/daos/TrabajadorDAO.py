@@ -324,11 +324,3 @@ class TrabajadorDAO:
                 return manager.rowcount
         except Exception as e:
             raise e
-    
-if __name__ == "__main__":
-    trabajadores = TrabajadorDAO.list()
-    for trabajador in trabajadores:
-        print(trabajador)
-        print(trabajador.get_datos_trabajador())
-        print(trabajador.get_usuario())
-        print('----------------------------------')

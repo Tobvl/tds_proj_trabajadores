@@ -44,6 +44,7 @@ class Trabajador:
     Dirección: {self._direccion}
     Fecha de Registro: {self._fecha_ingreso}
     Tipo de Usuario: {self._tipo_usuario}
+    Datos Laborales: {'Sin datos' if self._datos_trabajador == None else self._datos_trabajador}
     Puede modificar su ficha: {'Si' if self._modificacion_bloqueada == 0 else 'No'}
     """
     
