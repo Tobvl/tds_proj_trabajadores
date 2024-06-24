@@ -1,5 +1,4 @@
 from .DatosTrabajador import DatosTrabajador
-import Mensajes
 
 class Trabajador:
     def __init__(self,
