@@ -1,4 +1,5 @@
 from .DatosTrabajador import DatosTrabajador
+import Mensajes
 
 class Trabajador:
     def __init__(self,
@@ -14,7 +15,7 @@ class Trabajador:
                  telefono=None,
                  direccion=None,
                  tipo_usuario=None,
-                 datos_trabajador=None,
+                 datos_trabajador: DatosTrabajador=None,
                  fecha_ingreso=None,
                  modificacion_bloqueada=None):
         self._id_usuario = id_usuario

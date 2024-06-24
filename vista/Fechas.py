@@ -29,5 +29,8 @@ class Fechas:
             raise ValueError("El año es inválido. Debe ser un número positivo.")
 
         # Si todas las verificaciones pasan, la fecha es válida
-        print("Fecha válida!")
+        if mes < 10:
+            mes = f"0{mes}"
+        if dia < 10:
+            dia = f"0{dia}"
         return f"{dia}-{mes}-{año}"

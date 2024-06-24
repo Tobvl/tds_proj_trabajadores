@@ -32,7 +32,7 @@ class Conexion:
                 # print('Pool creada exitosamente')
                 return cls._pool
             except Exception as e:
-                print(f'Error mientras se creaba la pool de la base de datos: {e}')
+                print(f'\n{ERROR}Ocurrió un error mientras se creaba la base de datos! Contacte a un administrador.{Style.RESET_ALL}')
                 sys.exit()
         else:
             return cls._pool
@@ -64,14 +64,12 @@ class manejadorBD:
     def __exit__(self, e_type, e_value, e_detail):
         if e_value:
             self._conexion.rollback()
-            print("Ocurrió un error! Por favor, contacte al administrador.", e_value)
+            print("Ocurrió un error! Por favor, contacte al administrador.")
             return
         else:
             self._conexion.commit()
         self._manager.close()
         Conexion.dropConnection(self._conexion)
-
-
 
 try:    
     # Crear tablas al iniciar la app si no existen

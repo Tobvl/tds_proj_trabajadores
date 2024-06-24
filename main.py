@@ -12,5 +12,11 @@ sys.path.append("..")
 sys.path.append(".")
 
 # Llamar a la función principal de la aplicación
-menuPrincipal()
+
+try:
+    menuPrincipal()
+except KeyboardInterrupt:
+    print("\nHasta la próxima!")
+    exit(0)
+
 

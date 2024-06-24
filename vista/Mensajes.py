@@ -1,5 +1,5 @@
 # coding: utf8
-import datetime
+from datetime import datetime
 import random, pwinput
 from colorama import Fore, Style
 from rich.progress import track
@@ -19,7 +19,7 @@ CIAN = f"{Fore.CYAN}"
 separador = f"{AMARILLO} >>{Style.RESET_ALL} "
 VERDE_CLARO = f"{Fore.LIGHTGREEN_EX}"
 TITULO = f"{Fore.CYAN}CORREO YURY{Style.RESET_ALL}"
-VERSION = f"{Fore.CYAN}v1.0.0{Style.RESET_ALL}"
+VERSION = f"{Fore.CYAN}v1.0.1{Style.RESET_ALL}"
 EXITO = f"{VERDE}EXITO{separador}{Fore.LIGHTGREEN_EX}"    
 INFO = f"{Fore.WHITE}INFORMACIÓN{separador}"
 ADVERTENCIA = f"{AMARILLO}ADVERTENCIA{separador}"
@@ -28,7 +28,7 @@ tipos = [EXITO, INFO, ADVERTENCIA, ERROR]
 
 class Mensaje():
     """
-    Clase que define los mensajes de la aplicación.
+    Clase que define los mensajes y menús de la aplicación.
     """
      
     def __init__(self, tipo=None, mensaje=None):
@@ -466,8 +466,8 @@ class MenuInterno:
             if filtros.keys():
                 valores_filtrados = ', '.join([f"{VERDE}{k}{AMARILLO}:{VERDE_CLARO}{'|'.join([f'{filtro}' for filtro in v])}" for k, v in filtros.items()])
 
-            print(orden)
-            print(filtros)
+            # print(orden)
+            # print(filtros)
             
             #limpiar diccionario si tiene llaves vacías
             for llave in list(orden.keys()):
@@ -710,7 +710,7 @@ class MenuInterno:
 
     @classmethod
     def imprimirTrabajadoresOF(self, lista_trabajadores, orden=None, filtros=None):
-        print(lista_trabajadores)
+        [print(datetime.strptime(str(trabajador.fecha_ingreso), "%Y-%m-%d %H:%M:%S").strftime("%d-%m-%Y")) for trabajador in lista_trabajadores]
         if orden:
             claves_orden = orden
             
@@ -736,9 +736,9 @@ class MenuInterno:
                 elif clave == "nombre_excluir":
                     lista_trabajadores = [x for x in lista_trabajadores if all([filtro not in x.nombre for filtro in filtros[clave]])]
                 elif clave == "fecha_ingreso_incluir":
-                    lista_trabajadores = [x for x in lista_trabajadores if any([filtro in str(x.fecha_ingreso) for filtro in filtros[clave]])]
+                    lista_trabajadores = [x for x in lista_trabajadores if any([filtro in datetime.strptime(str(x.fecha_ingreso), "%Y-%m-%d %H:%M:%S").strftime("%d-%m-%Y") for filtro in filtros[clave]])]
                 elif clave == "fecha_ingreso_excluir":
-                    lista_trabajadores = [x for x in lista_trabajadores if all([filtro not in str(x.fecha_ingreso) for filtro in filtros[clave]])]
+                    lista_trabajadores = [x for x in lista_trabajadores if all([filtro not in datetime.strptime(str(x.fecha_ingreso), "%Y-%m-%d %H:%M:%S").strftime("%d-%m-%Y") for filtro in filtros[clave]])]
                 elif clave == "genero":
                     lista_trabajadores = [x for x in lista_trabajadores if any([filtro.lower()[0] in x.genero.lower()[0] for filtro in filtros[clave]])]
             
@@ -759,14 +759,17 @@ class MenuInterno:
         #         lista_trabajadores = [x for x in lista_trabajadores if filtros["genero"] == x.genero]
         if len(lista_trabajadores)<= 0:
             Mensaje(ERROR, "No se ha encontrado ningún trabajador con esos filtros!")
+            return lista_trabajadores
+        Mensaje(f"{VERDE} Imprimiendo lista de trabajadores!")
         for trabajador in lista_trabajadores:
             print(trabajador)
         return lista_trabajadores
-            
+
     @classmethod
     def listarTrabajadoresBaja(self):
         lista_trabajadores = TrabajadorDAO.list_baja()
-        esperar(1)
+        esperar5s("Consultando base de datos..", "Listando trabajadores dados de baja")
+        esperar(.5)
         for trabajador in lista_trabajadores:
             print(trabajador)
         esperar(2)

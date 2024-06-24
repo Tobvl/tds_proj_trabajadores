@@ -1,0 +1,46 @@
+services:
+  db:
+    container_name: base_de_datos
+    image: mysql:5.7
+    restart: always
+    environment:
+      MYSQL_DATABASE: 'correoyury'
+      # Usuario de la base de datos
+      MYSQL_USER: 'correoyury'
+      # Contraseña para el usuario de la base de datos
+      MYSQL_PASSWORD: 'correoyury@2024'
+      # Contraseña para el usuario root de la base de datos
+      MYSQL_ROOT_PASSWORD: 'root'
+    ports:
+      # <Puerto expuesto> : <Puerto MySQL dentro del contenedor>
+      - '3306:3306'
+    expose:
+      # Abre el puerto 3306 en el contenedor
+      - '3306'
+    networks:
+      - tdsnetwork
+      # Para persistencia de datos
+    volumes:
+      - "./database/init.sql:/docker-entrypoint-initdb.d/init.sql"
+      - "./database_data:/var/lib/mysql"
+    command: ['mysqld', '--character-set-server=utf8mb4', '--collation-server=utf8mb4_unicode_ci']
+
+volumes:
+  mi-volumen:
+
+networks:
+  tdsnetwork:
+    driver: bridge
+
+  # containerizar la app, innecesario de momento
+  # app:
+  #   depends_on:
+  #     - db
+  #   container_name: app
+  #   build: '.'
+  #   networks:
+  #     - tdsnetwork
+  #   stdin_open: true # docker run -i
+  #   tty: true        # docker run -t
+  #   entrypoint: ["/bin/sh"]
+  #   command: ["-c", "python main.py"]

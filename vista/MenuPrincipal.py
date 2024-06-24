@@ -1,5 +1,5 @@
 import os
-print("menuprincipal.py cwd:",os.getcwd())
+# print("menuprincipal.py cwd:",os.getcwd())
 from .Mensajes import Mensaje as msj
 from .Mensajes import Menu as menu
 from .Mensajes import ADVERTENCIA, ERROR, EXITO, INFO
@@ -32,5 +32,9 @@ def menuPrincipal():
 
 if __name__ == "__main__":
 
-    print(os.getcwd())
-    menuPrincipal()
+    # print(os.getcwd())
+    try:
+        menuPrincipal()
+    except KeyboardInterrupt:
+        msj().mensaje("Hasta la próxima!")
+        exit(0)
