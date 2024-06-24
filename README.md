@@ -10,7 +10,7 @@ El nombre de archivo, el nombre de directorio o la sintaxis de la etiqueta del v
 - [Python 3.8+](https://www.python.org/downloads/)
 - [Docker compose](https://docs.docker.com/engine/install/) 
 - [Git](https://git-scm.com/downloads)
-
+- Docker Engine (o Docker Desktop) se debe tener instalado y corriendo en el sistema
 ## Modo de uso
 1. Clonar el repositorio
 
@@ -27,7 +27,7 @@ cd tds_proj_trabajadores
 3. Instalar dependencias del proyecto
 
 ```
-pip install -r requiremientos.txt
+pip install -r requerimientos.txt
 ```
 
 4. Levantar base de datos

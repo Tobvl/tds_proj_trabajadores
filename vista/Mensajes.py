@@ -501,22 +501,7 @@ class MenuInterno:
 
                 trabajadores = TrabajadorDAO.list()
 
-                if not filtros and not orden:
-                    for trabajador in trabajadores:
-                        print(trabajador)
-                        
-                elif filtros and not orden:
-                    #! aplicar filtros sin orden y mostrar
-                    self.imprimirTrabajadoresOF(trabajadores, filtros=filtros)
-
-                elif orden and not filtros:
-                    #! aplicar orden sin filtros y mostrar
-                    self.imprimirTrabajadoresOF(trabajadores, orden=orden)
-                    
-                elif orden and filtros:
-                    #! aplicar orden, filtros y mostrar
-                    print("Aplicando orden y filtros...")
-                    self.imprimirTrabajadoresOF(trabajadores, orden=orden, filtros=filtros)
+                self.imprimirTrabajadoresOF(trabajadores, orden=orden, filtros=filtros)
                 
             elif pregunta == "2":
                 # preguntar si quiere ordenar la lista de los trabajadores.
@@ -568,8 +553,8 @@ class MenuInterno:
                     elif ordenar_por == "3": #ordenar por genero
                         tipo_orden = Mensaje().pregunta(f"""
     {VERDE_CLARO}Ordenar por género:
-    {VERDE_CLARO}1. {AMARILLO}Masculinos primero
-    {VERDE_CLARO}2. {AMARILLO}Femeninos primero
+    {VERDE_CLARO}1. {AMARILLO}Femeninas primero
+    {VERDE_CLARO}2. {AMARILLO}Masculinos primero
     {VERDE_CLARO}0. {AMARILLO}Volver atrás""")
                         if tipo_orden == "1":
                             orden["genero"] = "M"
@@ -615,12 +600,14 @@ class MenuInterno:
                             # que contenga
                             texto_a_incluir = Mensaje().pregunta("Ingrese el texto a incluir en el nombre: ")
                             filtros["nombre_incluir"].append(texto_a_incluir)
+                            Mensaje(EXITO, "Filtro agregado con éxito!")
                         elif tipo_filtro == "2":
                             if "nombre_excluir" not in filtros:
                                 filtros["nombre_excluir"] = []
                             # que no contenga
                             texto_a_excluir = Mensaje().pregunta("Ingrese el texto a excluir en el nombre: ")
                             filtros["nombre_excluir"].append(texto_a_excluir)
+                            Mensaje(EXITO, "Filtro agregado con éxito!")
                         elif tipo_filtro == "0":
                             Mensaje(INFO, "Volviendo atrás...")
                             esperar(0.5)
@@ -643,6 +630,7 @@ class MenuInterno:
                             try:
                                 fecha_a_incluir = Fechas.verificar_formato_fecha(fecha_a_incluir)
                                 filtros["fecha_ingreso_incluir"].append(fecha_a_incluir)
+                                Mensaje(EXITO, "Filtro agregado con éxito!")
                             except Exception as e:
                                 Mensaje(ADVERTENCIA, f"Fecha no válida, intente de nuevo... {e}")
                                 esperar(0.5)
@@ -655,6 +643,7 @@ class MenuInterno:
                             try:
                                 fecha_a_excluir = Fechas.verificar_formato_fecha(fecha_a_excluir)
                                 filtros["fecha_ingreso_excluir"].append(fecha_a_excluir)
+                                Mensaje(EXITO, "Filtro agregado con éxito!")
                             except Exception as e:
                                 Mensaje(ADVERTENCIA, f"Fecha no válida, intente de nuevo... {e}")
                                 esperar(0.5)
@@ -671,14 +660,17 @@ class MenuInterno:
                         if "genero" not in filtros:
                             filtros["genero"] = []
                         tipo_filtro = Mensaje().pregunta(f"""
-    {VERDE_CLARO}Ordenar por género:
-    {VERDE_CLARO}1. {AMARILLO}Masculinos primero
-    {VERDE_CLARO}2. {AMARILLO}Femeninos primero
+    {VERDE_CLARO}Filtrar por género:
+    {VERDE_CLARO}1. {AMARILLO}Sólo Masculinos
+    {VERDE_CLARO}2. {AMARILLO}Sólo Femeninas
     {VERDE_CLARO}0. {AMARILLO}Volver atrás""")
                         if tipo_filtro == "1":
-                            orden["genero"] = "M"
+                            filtros["genero"] = "M"
+                            Mensaje(EXITO, "Filtro agregado con éxito!")
                         elif tipo_filtro == "2":
-                            orden["genero"] = "F"
+                            filtros["genero"] = "F"
+                            Mensaje(EXITO, "Filtro agregado con éxito!")
+                        
                         elif tipo_filtro == "0":
                             Mensaje(INFO, "Volviendo atrás...")
                             esperar(0.5)
@@ -718,6 +710,7 @@ class MenuInterno:
 
     @classmethod
     def imprimirTrabajadoresOF(self, lista_trabajadores, orden=None, filtros=None):
+        print(lista_trabajadores)
         if orden:
             claves_orden = orden
             
@@ -735,6 +728,7 @@ class MenuInterno:
                     lista_trabajadores.sort(key= lambda trabajador: getattr(trabajador, clave).lower())
                 elif direccion == "F":
                     lista_trabajadores.sort(key= lambda trabajador: getattr(trabajador, clave).lower(), reverse=True)
+
         if filtros:
             for clave in filtros:
                 if clave == "nombre_incluir":
@@ -742,11 +736,11 @@ class MenuInterno:
                 elif clave == "nombre_excluir":
                     lista_trabajadores = [x for x in lista_trabajadores if all([filtro not in x.nombre for filtro in filtros[clave]])]
                 elif clave == "fecha_ingreso_incluir":
-                    lista_trabajadores = [x for x in lista_trabajadores if any([filtro in x.fecha_ingreso for filtro in filtros[clave]])]
+                    lista_trabajadores = [x for x in lista_trabajadores if any([filtro in str(x.fecha_ingreso) for filtro in filtros[clave]])]
                 elif clave == "fecha_ingreso_excluir":
-                    lista_trabajadores = [x for x in lista_trabajadores if all([filtro not in x.fecha_ingreso for filtro in filtros[clave]])]
+                    lista_trabajadores = [x for x in lista_trabajadores if all([filtro not in str(x.fecha_ingreso) for filtro in filtros[clave]])]
                 elif clave == "genero":
-                    lista_trabajadores = [x for x in lista_trabajadores if any([filtro.lower() in x.genero for filtro in filtros[clave]])]
+                    lista_trabajadores = [x for x in lista_trabajadores if any([filtro.lower()[0] in x.genero.lower()[0] for filtro in filtros[clave]])]
             
         # if orden.keys()>0:
         #     if "nombre" in orden.keys():
@@ -763,6 +757,8 @@ class MenuInterno:
         #         lista_trabajadores = [x for x in lista_trabajadores if filtros["fecha_ingreso"] == x.fecha_ingreso]
         #     if "genero" in filtros.keys():
         #         lista_trabajadores = [x for x in lista_trabajadores if filtros["genero"] == x.genero]
+        if len(lista_trabajadores)<= 0:
+            Mensaje(ERROR, "No se ha encontrado ningún trabajador con esos filtros!")
         for trabajador in lista_trabajadores:
             print(trabajador)
         return lista_trabajadores
