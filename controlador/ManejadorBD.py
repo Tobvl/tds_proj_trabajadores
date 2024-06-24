@@ -32,7 +32,7 @@ class Conexion:
                 # print('Pool creada exitosamente')
                 return cls._pool
             except Exception as e:
-                print(f'\n{ERROR}Ocurrió un error mientras se creaba la base de datos! Contacte a un administrador.{Style.RESET_ALL}')
+                print(f'\n{ERROR}Ocurrió un error mientras se creaba la base de datos! Contacte a un administrador., {e}{Style.RESET_ALL}')
                 sys.exit()
         else:
             return cls._pool
