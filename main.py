@@ -4,7 +4,6 @@
 
 # Path: proyecto_correodeyury/tds_proj_trabajadores/vista/MenuPrincipal.py
 # Importar la vista
-import vista
 from vista.MenuPrincipal import menuPrincipal
 
 import sys

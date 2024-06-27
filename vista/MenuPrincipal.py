@@ -1,40 +1,71 @@
 import os
 # print("menuprincipal.py cwd:",os.getcwd())
-from .Mensajes import Mensaje as msj
-from .Mensajes import Menu as menu
-from .Mensajes import ADVERTENCIA, ERROR, EXITO, INFO
-from modelo.entidades.Trabajador import Trabajador
-from modelo.daos.TrabajadorDAO import TrabajadorDAO
 from time import sleep as esperar
+from colorama import Fore, Style
+
+AMARILLO = f"{Fore.YELLOW}"
+VERDE = f"{Fore.GREEN}"
+separador = f"{AMARILLO} >>{Style.RESET_ALL} "
+ADVERTENCIA = f"{AMARILLO}ADVERTENCIA{separador}"
+VERDE_CLARO = f"{Fore.LIGHTGREEN_EX}"
+TITULO = f"{Fore.CYAN}CORREO YURY{Style.RESET_ALL}"
+VERSION = f"{Fore.CYAN}v1.0.1{Style.RESET_ALL}"
+
+ERROR = f"{Fore.RED}ERROR{separador}{Fore.LIGHTRED_EX}"
+
+def bienvenida():
+    print(f"""
+
+        {VERDE_CLARO}Bienvenid@ a {TITULO} {VERSION} {VERDE_CLARO}
+
+
+        {VERDE_CLARO}1. {AMARILLO}Iniciar Sesión
+        {VERDE_CLARO}2. {AMARILLO}Salir""")
+    
+def pregunta(pregunta):
+    print(f"\n{VERDE}[?] {pregunta}")
+    p=input(f"{separador}").strip()
+    return p 
+
+def opcion_invalida():
+    print(ADVERTENCIA + "Opción no válida, intente de nuevo...\n")
+    esperar(.5)
 
 # Menú Principal Correo de Yury
 def menuPrincipal():
-    
     while True:
         # Menú para Iniciar sesión
-        msj().bienvenida()
+        bienvenida()
 
         # Opciones de Inicio de Sesión
-        pregunta = msj().pregunta("Escoge una opción: ")
+        preg = pregunta("Escoge una opción: ")
     
-        if pregunta == "1":
+        if preg == "1":
             # Inicio de sesión
-            menu.menuInicioSesion()
+            valor = False 
+            try:
+                from .Mensajes import Menu as menu
+                from controlador.ManejadorBD import Conexion as bd
+                if bd.testConnection():
+                    valor = True
+            except Exception as e:
+                print(f"{ERROR}Ha ocurrido un error inesperado! ({e}){Style.RESET_ALL}")
+                valor = False
+                
+            if valor: 
+                try:
+                    print("valor:",valor)
+                    menu.menuInicioSesion()
+                except Exception as e:
+                    valor = False
+                    print(f"{ERROR}Ha ocurrido un error inesperado! ({e}){Style.RESET_ALL}")
+                    continue
+            valor = False
             
-        elif pregunta == "2":
+        elif preg == "2":
             # Salir
-            msj("Hasta la próxima!")
+            print("Hasta la próxima!")
             break
         else:
-            msj().opcion_invalida()
+            opcion_invalida()
             continue
-
-
-if __name__ == "__main__":
-
-    # print(os.getcwd())
-    try:
-        menuPrincipal()
-    except KeyboardInterrupt:
-        msj().mensaje("Hasta la próxima!")
-        exit(0)

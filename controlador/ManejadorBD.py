@@ -33,7 +33,7 @@ class Conexion:
                 return cls._pool
             except Exception as e:
                 print(f'\n{ERROR}Ocurrió un error mientras se creaba la base de datos! Contacte a un administrador., {e}{Style.RESET_ALL}')
-                sys.exit()
+                # sys.exit()
         else:
             return cls._pool
                   
@@ -48,6 +48,19 @@ class Conexion:
     def dropConnection(cls, connection):
         connection.close()
         #print('Conexion guardada en la pool')
+
+    @classmethod
+    def testConnection(cls):
+        try:
+            connection = cls.getConnection()
+            cursor = connection.cursor(buffered=True)
+            cursor.execute("SELECT * from trabajador")
+            cursor.close()
+            cls.dropConnection(connection)
+            return True
+        except Exception as e:
+            print(f'\n{ERROR}Ocurrió un error mientras se probaba la conexión a la base de datos! Contacte a un administrador., {e}{Style.RESET_ALL}')
+            return False
 
 # Clase para manejar la base de datos usando with
 class manejadorBD:
@@ -95,5 +108,6 @@ try:
         manager.execute(CREATE_TABLES[0])
         manager.execute(CREATE_TABLES[1])
 except Exception as e:
-    print("Error al inicializar la base de datos:")
+    raise e
+    # ("Error al inicializar la base de datos:")
 
