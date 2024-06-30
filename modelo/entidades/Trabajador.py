@@ -1,4 +1,9 @@
 from .DatosTrabajador import DatosTrabajador
+from colorama import Fore, Style
+
+VERDE = f"{Fore.GREEN}"
+ROJO_CLARO = f"{Fore.LIGHTRED_EX}"
+VERDE_CLARO = f"{Fore.LIGHTGREEN_EX}"
 
 class Trabajador:
     def __init__(self,
@@ -35,17 +40,17 @@ class Trabajador:
     
     def __str__(self):
         return f"""
-    Nombre: {self._nombre} {self._apellido}
-    Usuario: {self._nombre_usuario}
-    RUN: {self._run}-{self._rundf}
-    Correo: {self._correo}
-    Género: {self._genero}
-    Teléfono: {self._telefono}
-    Dirección: {self._direccion}
-    Fecha de Registro: {self._fecha_ingreso}
-    Tipo de Usuario: {self._tipo_usuario}
-    Datos Laborales: {'Sin datos' if self._datos_trabajador == None else self._datos_trabajador}
-    Puede modificar su ficha: {'Si' if self._modificacion_bloqueada == 0 else 'No'}
+    {VERDE}Nombre: {VERDE_CLARO}{self._nombre} {self._apellido}
+    {VERDE}Usuario: {VERDE_CLARO}{self._nombre_usuario}
+    {VERDE}RUN: {VERDE_CLARO}{self._run}-{self._rundf}
+    {VERDE}Correo: {VERDE_CLARO}{self._correo}
+    {VERDE}Género: {VERDE_CLARO}{self._genero}
+    {VERDE}Teléfono: {VERDE_CLARO}{self._telefono}
+    {VERDE}Dirección: {VERDE_CLARO}{self._direccion}
+    {VERDE}Fecha de Registro: {VERDE_CLARO}{self._fecha_ingreso}
+    {VERDE}Tipo de Usuario: {VERDE_CLARO}{self._tipo_usuario}
+    {VERDE}Datos Laborales: {f'{ROJO_CLARO}Sin datos' if self._datos_trabajador == None else f'{VERDE}Con datos'}{Style.RESET_ALL}
+    {VERDE}Puede modificar su ficha: {VERDE_CLARO}{'Si' if self._modificacion_bloqueada == 0 else 'No'}{Style.RESET_ALL}
     """
     
     @property

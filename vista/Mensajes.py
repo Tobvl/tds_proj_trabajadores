@@ -7,6 +7,7 @@ from time import sleep as esperar
 from itertools import cycle
 from modelo.daos.TrabajadorDAO import TrabajadorDAO
 from modelo.daos.AccesoDAO import AccesoDAO
+from modelo.daos.DatosTrabajadorDAO import DatosTrabajadorDAO
 from modelo.entidades.Trabajador import Trabajador
 from vista.Fechas import Fechas
 
@@ -304,6 +305,309 @@ class MenuInterno:
                     esperar(0.5)
                     return
 
+    @classmethod
+    def menuModificarContactoEmergencia(self, trabajador: Trabajador):
+        while True:
+            datos_trabajador = trabajador.datos_trabajador
+            if datos_trabajador:
+                id_contacto_emergencia = DatosTrabajadorDAO.get_idcontacto_emergencia(datos_trabajador)
+                info_contacto_emergencia = DatosTrabajadorDAO.get_infocontacto_emergencia(id_contacto_emergencia)
+                
+            if info_contacto_emergencia:
+                opciones = Mensaje().pregunta(f"""
+    {VERDE}Modificando contacto de emergencia de {CIAN}{trabajador.nombre} {trabajador.apellido} [{VERDE_CLARO}{trabajador.nombre_usuario}{CIAN}]
+    {VERDE}Nombre: {CIAN}{info_contacto_emergencia[1]} {VERDE}TEL: {CIAN}{info_contacto_emergencia[2]}
+    {VERDE_CLARO}1. {AMARILLO}Cambiar {VERDE}Contacto de Emergencia
+    {VERDE_CLARO}2. {AMARILLO}Eliminar {VERDE}Contacto de Emergencia
+    {VERDE_CLARO}0. {AMARILLO}Volver atrás""")
+                if opciones == "1": # Cambiar contacto de emergencia actual
+                    contacto_nombre = Mensaje().pregunta("Nombre del contacto de emergencia:         [0 para salir]")
+                    if contacto_nombre == "0":
+                        Mensaje(INFO, "Volviendo al menú principal...")
+                        esperar(0.5)
+                        return
+                    contacto_telefono = Mensaje().pregunta("Teléfono del contacto de emergencia:         [0 para salir]")
+                    if contacto_telefono == "0":
+                        Mensaje(INFO, "Volviendo al menú principal...")
+                        esperar(0.5)
+                        return
+                    try:
+                        int(contacto_telefono)
+                    except ValueError:
+                        Mensaje(ADVERTENCIA, "El teléfono debe ser un número, intente de nuevo...")
+                        esperar(0.5)
+                        continue
+                    while True:
+                        confirmar = Mensaje().pregunta(f"""
+    ¿Confirmas modificar tu contacto de emergencia a
+    {contacto_nombre} TEL:{contacto_telefono}?:
+
+    {VERDE_CLARO}1. {VERDE}MODIFICAR
+    {VERDE_CLARO}2. {ROJO}CANCELAR
+    """)
+                        if confirmar == "1":
+                            DatosTrabajadorDAO.modificar_contacto_emergencia(id_contacto_emergencia, contacto_nombre, contacto_telefono)
+                            Mensaje(EXITO, "Contacto de emergencia modificado con éxito!")
+                            esperar(1)
+                            return
+                        elif confirmar == "2":
+                            Mensaje(INFO, "Volviendo al menú principal...")
+                            esperar(0.5)
+                            return
+                        else:
+                            Mensaje(ADVERTENCIA, "Opción no válida, intente de nuevo...")
+                            esperar(0.5)
+                            continue
+                elif opciones == "2": # Eliminar contacto de emergencia eliminar_contacto_emergencia
+                    while True:
+                        
+                        confirmar = Mensaje().pregunta(f"""
+    ¿Confirmas eliminar tu contacto de emergencia
+    {info_contacto_emergencia[1]} TEL:{info_contacto_emergencia[2]}?:
+    
+    {VERDE_CLARO}1. {ROJO}ELIMINAR
+    {VERDE_CLARO}2. {VERDE}CANCELAR
+    """)
+                        if confirmar == "1":
+                            DatosTrabajadorDAO.eliminar_contacto_emergencia(id_contacto_emergencia)
+                            Mensaje(EXITO, "Contacto de emergencia eliminado con éxito!")
+                            esperar(1)
+                            return
+                        elif confirmar == "2":
+                            Mensaje(INFO, "Volviendo al menú principal...")
+                            esperar(0.5)
+                            return
+                        else:
+                            Mensaje(ADVERTENCIA, "Opción no válida, intente de nuevo...")
+                            esperar(0.5)
+                            continue
+                elif opciones == "0":
+                    Mensaje(INFO, "Volviendo al menú principal...")
+                    esperar(0.5)
+                    return
+                else:
+                    Mensaje(ADVERTENCIA, "Opción no válida, intente de nuevo...")
+                    esperar(0.5)
+                    continue
+            else:
+                opciones = Mensaje().pregunta(f"""
+    {VERDE}Modificando contacto de emergencia de {CIAN}{trabajador.nombre} {trabajador.apellido} [{VERDE_CLARO}{trabajador.nombre_usuario}{CIAN}]
+    {VERDE_CLARO}1. {AMARILLO}Agregar {VERDE}Contacto de Emergencia
+    {VERDE_CLARO}0. {AMARILLO}Volver atrás""")
+                if opciones == "1": # Agregar contacto de emergencia
+                    contacto_nombre = Mensaje().pregunta("Nombre del contacto de emergencia:         [0 para salir]")
+                    if contacto_nombre == "0":
+                        Mensaje(INFO, "Volviendo al menú principal...")
+                        esperar(0.5)
+                        return
+                    contacto_telefono = Mensaje().pregunta("Teléfono del contacto de emergencia:         [0 para salir]")
+                    if contacto_telefono == "0":
+                        Mensaje(INFO, "Volviendo al menú principal...")
+                        esperar(0.5)
+                        return
+                    try:
+                        int(contacto_telefono)
+                    except ValueError:
+                        Mensaje(ADVERTENCIA, "El teléfono debe ser un número, intente de nuevo...")
+                        esperar(0.5)
+                        continue
+                    while True:
+                        confirmar = Mensaje().pregunta(f"""
+        ¿Confirmas agregar tu contacto de emergencia
+        {contacto_nombre} TEL:{contacto_telefono}?:
+
+        {VERDE_CLARO}1. {VERDE}AGREGAR
+        {VERDE_CLARO}2. {ROJO}CANCELAR
+        """)
+                        if confirmar == "1":
+                            DatosTrabajadorDAO.agregar_contacto_emergencia(trabajador.datos_trabajador, contacto_nombre, contacto_telefono)
+                            Mensaje(EXITO, "Contacto de emergencia modificado con éxito!")
+                            esperar(1)
+                            return
+                        elif confirmar == "2":
+                            Mensaje(INFO, "Volviendo al menú principal...")
+                            esperar(0.5)
+                            return
+                        else:
+                            Mensaje(ADVERTENCIA, "Opción no válida, intente de nuevo...")
+                            esperar(0.5)
+                            continue
+                elif opciones == "0":
+                    Mensaje(INFO, "Volviendo atrás...")
+                    esperar(0.5)
+                    return
+                else:
+                    Mensaje(ADVERTENCIA, "Opción no válida, intente de nuevo...")
+                    esperar(0.5)   
+                            
+    @classmethod
+    def menuModificarCargaFamiliar(self, trabajador: Trabajador):
+        while True:
+            datos_trabajador = trabajador.datos_trabajador
+            if datos_trabajador:
+                id_carga_familiar = DatosTrabajadorDAO.get_idcarga_familiar(datos_trabajador)
+                info_carga_familiar = DatosTrabajadorDAO.get_infocarga_familiar(id_carga_familiar)
+            if info_carga_familiar:
+                opciones = Mensaje().pregunta(f"""
+    {VERDE}Modificando carga familiar de {CIAN}{trabajador.nombre} {trabajador.apellido} [{VERDE_CLARO}{trabajador.nombre_usuario}{CIAN}]
+    {VERDE}Nombre: {CIAN}{info_carga_familiar[1]} {VERDE}EDAD: {CIAN}{info_carga_familiar[2]} {VERDE}PARENTESCO: {CIAN}{info_carga_familiar[3]}
+    {VERDE_CLARO}1. {AMARILLO}Cambiar {VERDE}Carga Familiar
+    {VERDE_CLARO}2. {AMARILLO}Eliminar {VERDE}Carga Familiar
+    {VERDE_CLARO}0. {AMARILLO}Volver atrás""")
+                if opciones == "1": # Cambiar carga familiar actual
+                    carga_nombre = Mensaje().pregunta("Nombre de la carga:         [0 para salir]")
+                    if carga_nombre == "0":
+                        Mensaje(INFO, "Volviendo al menú principal...")
+                        esperar(0.5)
+                        return
+                    carga_edad = Mensaje().pregunta("Edad de la carga:         [0 para salir]")
+                    if carga_edad == "0":
+                        Mensaje(INFO, "Volviendo al menú principal...")
+                        esperar(0.5)
+                        return
+                    try:
+                        int(carga_edad)
+                    except ValueError:
+                        Mensaje(ADVERTENCIA, "La edad debe ser un número, intente de nuevo...")
+                        esperar(0.5)
+                        continue
+                    carga_parentesco = Mensaje().pregunta("Parentesco de la carga:         [0 para salir]")
+                    if carga_parentesco == "0":
+                        Mensaje(INFO, "Volviendo al menú principal...")
+                        esperar(0.5)
+                        return
+
+                    while True:
+                        confirmar = Mensaje().pregunta(f"""
+    ¿Confirmas modificar tu carga familiar a
+    {carga_nombre} EDAD:{carga_edad} PARENTESCO: {carga_parentesco}?:
+
+    {VERDE_CLARO}1. {VERDE}MODIFICAR
+    {VERDE_CLARO}2. {ROJO}CANCELAR
+    """)
+                        if confirmar == "1":
+                            DatosTrabajadorDAO.modificar_carga_familiar(id_carga_familiar, carga_nombre, carga_edad, carga_parentesco)
+                            Mensaje(EXITO, "Carga familiar modificada con éxito!")
+                            esperar(1)
+                            return
+                        elif confirmar == "2":
+                            Mensaje(INFO, "Volviendo al menú principal...")
+                            esperar(0.5)
+                            return
+                        else:
+                            Mensaje(ADVERTENCIA, "Opción no válida, intente de nuevo...")
+                            esperar(0.5)
+                            continue
+                elif opciones == "2": # Eliminar carga familiar
+                    while True:
+                        
+                        confirmar = Mensaje().pregunta(f"""
+    ¿Confirmas eliminar tu carga familiar
+    {info_carga_familiar[1]} EDAD:{info_carga_familiar[2]} PARENTESCO:{info_carga_familiar[3]}?:
+    
+    {VERDE_CLARO}1. {ROJO}ELIMINAR
+    {VERDE_CLARO}2. {VERDE}CANCELAR
+    """)
+                        if confirmar == "1":
+                            DatosTrabajadorDAO.eliminar_carga_familiar(id_carga_familiar)
+                            Mensaje(EXITO, "Carga familiar eliminada con éxito!")
+                            esperar(1)
+                            return
+                        elif confirmar == "2":
+                            Mensaje(INFO, "Volviendo al menú principal...")
+                            esperar(0.5)
+                            return
+                        else:
+                            Mensaje(ADVERTENCIA, "Opción no válida, intente de nuevo...")
+                            esperar(0.5)
+                            continue
+                elif opciones == "0":
+                    Mensaje(INFO, "Volviendo al menú principal...")
+                    esperar(0.5)
+                    return
+                else:
+                    Mensaje(ADVERTENCIA, "Opción no válida, intente de nuevo...")
+                    esperar(0.5)
+                    continue
+            else:
+                opciones = Mensaje().pregunta(f"""
+    {VERDE}Modificando carga familiar de {CIAN}{trabajador.nombre} {trabajador.apellido} [{VERDE_CLARO}{trabajador.nombre_usuario}{CIAN}]
+    {VERDE_CLARO}1. {AMARILLO}Agregar {VERDE}Carga Familiar
+    {VERDE_CLARO}0. {AMARILLO}Volver atrás""")
+                if opciones == "1": # Agregar carga familiar
+                    carga_nombre = Mensaje().pregunta("Nombre de la carga:         [0 para salir]")
+                    if carga_nombre == "0":
+                        Mensaje(INFO, "Volviendo al menú principal...")
+                        esperar(0.5)
+                        return
+                    carga_edad = Mensaje().pregunta("Edad de la carga:         [0 para salir]")
+                    if carga_edad == "0":
+                        Mensaje(INFO, "Volviendo al menú principal...")
+                        esperar(0.5)
+                        return
+                    try:
+                        int(carga_edad)
+                    except ValueError:
+                        Mensaje(ADVERTENCIA, "La edad debe ser un número, intente de nuevo...")
+                        esperar(0.5)
+                        continue
+                    carga_parentesco = Mensaje().pregunta("Parentesco de la carga:         [0 para salir]")
+                    if carga_parentesco == "0":
+                        Mensaje(INFO, "Volviendo al menú principal...")
+                        esperar(0.5)
+                        return
+                    while True:
+                        confirmar = Mensaje().pregunta(f"""
+        ¿Confirmas agregar tu carga familiar
+        {carga_nombre} EDAD:{carga_edad} PARENTESCO:{carga_parentesco}?:
+
+        {VERDE_CLARO}1. {VERDE}AGREGAR
+        {VERDE_CLARO}2. {ROJO}CANCELAR
+        """)
+                        if confirmar == "1":
+                            DatosTrabajadorDAO.agregar_carga_familiar(trabajador.datos_trabajador, carga_nombre, carga_edad, carga_parentesco)
+                            Mensaje(EXITO, "Carga familiar modificada con éxito!")
+                            esperar(1)
+                            return
+                        elif confirmar == "2":
+                            Mensaje(INFO, "Volviendo al menú principal...")
+                            esperar(0.5)
+                            return
+                        else:
+                            Mensaje(ADVERTENCIA, "Opción no válida, intente de nuevo...")
+                            esperar(0.5)
+                            continue
+                elif opciones == "0":
+                    Mensaje(INFO, "Volviendo atrás...")
+                    esperar(0.5)
+                    return
+                else:
+                    Mensaje(ADVERTENCIA, "Opción no válida, intente de nuevo...")
+                    esperar(0.5)   
+  
+    @classmethod
+    def menuModificarDatosLaborales(self, trabajador: Trabajador):
+        while True:
+            Mensaje(f"""
+    {VERDE}Modificando datos laborales de {CIAN}{trabajador.nombre} {trabajador.apellido} [{VERDE_CLARO}{trabajador.nombre_usuario}{CIAN}]
+    """)
+            
+            campo_modificar = Mensaje().pregunta(f"""
+    {VERDE_CLARO}1. {AMARILLO}Modificar {VERDE}Contacto de Emergencia
+    {VERDE_CLARO}2. {AMARILLO}Modificar {VERDE}Carga Familiar
+    {VERDE_CLARO}0. {AMARILLO}Volver atrás""")
+            if campo_modificar == "1":
+                self.menuModificarContactoEmergencia(trabajador)
+            elif campo_modificar == "2":
+                self.menuModificarCargaFamiliar(trabajador)
+            elif campo_modificar == "0":
+                Mensaje(INFO, "Volviendo atrás...")
+                esperar(0.5)
+                return
+            else:
+                Mensaje(ADVERTENCIA, "Opción no válida, intente de nuevo...")
+                esperar(0.5)
+                continue
     
     @classmethod
     def modificarDatosUsuario(self, usuario: Trabajador):
@@ -325,7 +629,7 @@ class MenuInterno:
                 self.modificarDatosPersonales(usuario)
             elif pregunta == "3":
                 # Modificar datos laborales
-                pass
+                self.menuModificarDatosLaborales(usuario)
             elif pregunta == "0":
                 Mensaje(INFO, "Volviendo al menú principal...")
                 return
@@ -342,7 +646,15 @@ class MenuInterno:
             trabajadores = TrabajadorDAO.list()
             for trabajador in trabajadores:
                 Mensaje(f"{VERDE_CLARO}ID: {CIAN}{trabajador.nombre_usuario:12s}{VERDE_CLARO} | {trabajador.nombre} {trabajador.apellido}")
+            if len(trabajadores) == 0:
+                Mensaje(INFO, "No hay trabajadores registrados en el sistema...")
+                esperar(0.5)
+                return
             id_trabajador = Mensaje().pregunta(f"{VERDE}Ingrese {CIAN}ID {VERDE}de trabajador a dar de baja       [0 para salir]: ")
+            if id_trabajador == administrativo.nombre_usuario:
+                Mensaje(ADVERTENCIA, "No puedes darte de baja a ti mismo!")
+                esperar(0.5)
+                continue
             if id_trabajador == "0":
                 Mensaje(INFO, "Volviendo al menú de gestión de trabajadores...")
                 esperar(0.5)
@@ -356,7 +668,7 @@ class MenuInterno:
                 trabajador = TrabajadorDAO.get(id_trabajador)
                 print(trabajador)
                 confirmar = Mensaje().pregunta(f"""
-    ¿Confirmas Dar de baja a          [0 para salir]
+    ¿Confirmas Dar de baja a
     {trabajador.nombre} {trabajador.apellido} [{trabajador.nombre_usuario}]?:
 
     {VERDE_CLARO}1. {ROJO}SI, DAR DE BAJA DEL SISTEMA
@@ -380,6 +692,10 @@ class MenuInterno:
                     Mensaje(ADVERTENCIA, "Cancelando dar de baja a usuario...")
                     esperar(0.5)
                     break
+                else:
+                    Mensaje(ADVERTENCIA, "Opción no válida, intente de nuevo...")
+                    esperar(0.5)
+                    continue
             except:
                 Mensaje(ERROR, "Error al dar de baja al trabajador, intente de nuevo...")
                 esperar(0.5)
@@ -433,8 +749,8 @@ class MenuInterno:
                         break
                     try:
                         self.menuModificarTrabajador(id_trabajador)
-                    except:
-                        Mensaje(ERROR, "Error al modificar trabajador, intente de nuevo...")
+                    except Exception as e:
+                        Mensaje(ERROR, f"Error al modificar trabajador, intente de nuevo... {e}")
                         esperar(0.5)
                         return
                 elif pregunta == "4":
@@ -501,6 +817,11 @@ class MenuInterno:
 
                 trabajadores = TrabajadorDAO.list()
 
+                if len(trabajadores) == 0:
+                    Mensaje(INFO, "No hay trabajadores registrados en el sistema...")
+                    esperar(0.5)
+                    return
+                
                 self.imprimirTrabajadoresOF(trabajadores, orden=orden, filtros=filtros)
                 
             elif pregunta == "2":
@@ -710,7 +1031,7 @@ class MenuInterno:
 
     @classmethod
     def imprimirTrabajadoresOF(self, lista_trabajadores, orden=None, filtros=None):
-        [print(datetime.strptime(str(trabajador.fecha_ingreso), "%Y-%m-%d %H:%M:%S").strftime("%d-%m-%Y")) for trabajador in lista_trabajadores]
+        # [print(datetime.strptime(str(trabajador.fecha_ingreso), "%Y-%m-%d %H:%M:%S").strftime("%d-%m-%Y")) for trabajador in lista_trabajadores]
         if orden:
             claves_orden = orden
             
@@ -741,22 +1062,7 @@ class MenuInterno:
                     lista_trabajadores = [x for x in lista_trabajadores if all([filtro not in datetime.strptime(str(x.fecha_ingreso), "%Y-%m-%d %H:%M:%S").strftime("%d-%m-%Y") for filtro in filtros[clave]])]
                 elif clave == "genero":
                     lista_trabajadores = [x for x in lista_trabajadores if any([filtro.lower()[0] in x.genero.lower()[0] for filtro in filtros[clave]])]
-            
-        # if orden.keys()>0:
-        #     if "nombre" in orden.keys():
-        #         print("Ordenando por nombre")
-        #         lista_trabajadores = sorted(lista_trabajadores, key=lambda x: x.nombre, reverse=True if orden["nombre"] == "DESC" else False)
-        #     if "fecha_ingreso" in orden.keys():
-        #         lista_trabajadores = sorted(lista_trabajadores, key=lambda x: x.fecha_ingreso, reverse=True if orden["fecha_ingreso"] == "ANTIGUA" else False)
-        #     if "genero" in orden.keys():
-        #         lista_trabajadores = sorted(lista_trabajadores, key=lambda x: x.genero, reverse=True if orden["genero"] == "F" else False)
-        # if filtros.keys()>0:
-        #     if "nombre" in filtros.keys():
-        #         lista_trabajadores = [x for x in lista_trabajadores if filtros["nombre"].lower() in x.nombre.lower()]
-        #     if "fecha_ingreso" in filtros.keys():
-        #         lista_trabajadores = [x for x in lista_trabajadores if filtros["fecha_ingreso"] == x.fecha_ingreso]
-        #     if "genero" in filtros.keys():
-        #         lista_trabajadores = [x for x in lista_trabajadores if filtros["genero"] == x.genero]
+
         if len(lista_trabajadores)<= 0:
             Mensaje(ERROR, "No se ha encontrado ningún trabajador con esos filtros!")
             return lista_trabajadores
@@ -768,12 +1074,15 @@ class MenuInterno:
     @classmethod
     def listarTrabajadoresBaja(self):
         lista_trabajadores = TrabajadorDAO.list_baja()
-        esperar5s("Consultando base de datos..", "Listando trabajadores dados de baja")
+        esperar5s("Listando trabajadores dados de baja")
         esperar(.5)
         for trabajador in lista_trabajadores:
             print(trabajador)
+        if len(lista_trabajadores) == 0:
+            Mensaje(INFO, "No hay trabajadores dados de baja!")
+            esperar(2)
         esperar(2)
-        
+      
     @classmethod
     def menuModificarCampoTrabajador(self, campo, trabajador: Trabajador):
         if campo == "1":
@@ -828,8 +1137,18 @@ class MenuInterno:
             
         if campo == "7":
             campo == "Datos Laborales"
-            pass
-
+            self.menuModificarDatosLaborales(trabajador)
+        elif campo == "8":
+            while True:
+                confirmar = Mensaje().pregunta(f"""
+    {trabajador.nombre} {VERDE_CLARO}{'Si' if trabajador._modificacion_bloqueada == 0 else 'No'}{VERDE}tiene permitido modificar su ficha
+    ¿Alternar estado de modificación de ficha?:
+        {VERDE_CLARO}1. {AMARILLO}SI
+        {VERDE_CLARO}2. {AMARILLO}NO""")
+                if confirmar == "1":
+                    TrabajadorDAO.alternar_modificacion_ficha(trabajador)
+                    Mensaje(EXITO, f"Estado de modificación de ficha de {trabajador.nombre} modificado con éxito!")
+                    return
         
     @classmethod
     def modificarRutTrabajador(self, trabajador: Trabajador, run_anterior, rundf_anterior):
@@ -889,7 +1208,7 @@ class MenuInterno:
         while True:
             Mensaje(f"""
 
-    {VERDE_CLARO}Modificando ficha de {trabajador_a_modificar.nombre} {trabajador_a_modificar.apellido}!
+    {VERDE_CLARO}Modificando ficha de {CIAN}{trabajador_a_modificar.nombre} {trabajador_a_modificar.apellido}!
 
 
     {VERDE_CLARO}1. {AMARILLO}Modificar su {VERDE}Nombre
@@ -899,18 +1218,19 @@ class MenuInterno:
     {VERDE_CLARO}5. {AMARILLO}Modificar su {VERDE}Telefono
     {VERDE_CLARO}6. {AMARILLO}Modificar su {VERDE}Direccion
     {VERDE_CLARO}7. {AMARILLO}Modificar sus {VERDE}Datos Laborales
+    {VERDE_CLARO}8. {AMARILLO}Permitir/Bloquear {VERDE}modificación de ficha
     {VERDE_CLARO}0. {AMARILLO}Volver atrás""")
             pregunta = Mensaje().pregunta("Escoge una opción: ")
             if pregunta == "0":
                 Mensaje(INFO, "Volviendo al menú de gestión de trabajadores...")
                 esperar(0.5)
                 return
-            elif pregunta != "1" and pregunta != "2" and pregunta != "3" and pregunta != "4" and pregunta != "5" and pregunta != "6" and pregunta != "7":
+            elif pregunta != "1" and pregunta != "2" and pregunta != "3" and pregunta != "4" and pregunta != "5" and pregunta != "6" and pregunta != "7" and pregunta != "8":
                 Mensaje(ADVERTENCIA, "Opción no válida, intente de nuevo...")
                 esperar(0.5)
                 continue
             else:
-                # 1. nombre, 2. run, 3. correo, 4. genero, 5. telefono, 6. direccion, 7. datos_trabajador
+                # 1. nombre, 2. run, 3. correo, 4. genero, 5. telefono, 6. direccion, 7. datos laborales
                 self.menuModificarCampoTrabajador(pregunta, trabajador_a_modificar)
 
     

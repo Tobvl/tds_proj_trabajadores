@@ -1,5 +1,7 @@
+import time
 from controlador.ManejadorBD import manejadorBD
 from modelo.entidades.Trabajador import Trabajador
+from modelo.daos.DatosTrabajadorDAO import DatosTrabajadorDAO
 import bcrypt, os
 
 
@@ -40,9 +42,11 @@ class TrabajadorDAO:
         telefono,\
         direccion,\
         tipo_usuario, \
+        datos_trabajador, \
         fecha_ingreso, \
-        modificacion_bloqueada) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, NOW(), FALSE)'
+        modificacion_bloqueada) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, NOW(), FALSE)'
     _UPDATE = 'UPDATE trabajador SET %s=%s WHERE id_usuario=%s'
+    _UPDATE_MODIFICARFICHA = 'UPDATE trabajador SET modificacion_bloqueada=%s WHERE id_usuario=%s'
     _UPDATE_NOMBRE = 'UPDATE trabajador SET nombre=%s WHERE id_usuario=%s'
     _UPDATE_APELLIDO = 'UPDATE trabajador SET apellido=%s WHERE id_usuario=%s'
     _UPDATE_CORREO = 'UPDATE trabajador SET correo=%s WHERE id_usuario=%s'
@@ -78,21 +82,20 @@ class TrabajadorDAO:
     def dar_baja(cls, trabajador, administrativo):
         try:
             with manejadorBD() as manager:
-                print("obteniendo trabajador a dar de baja")
                 manager.execute(cls._SELECTID, (trabajador.id_usuario,))
                 trabajador_values = list(manager.fetchone()) 
-            print(trabajador_values)
+            # print(trabajador_values)
             insert_values = trabajador_values + [administrativo.nombre_usuario]
-            print(insert_values)
+            # print(insert_values)
             with manejadorBD() as manager:
-                print("Insertando dada de baja")
-                print(insert_values)
+                # print("Insertando dada de baja")
+                # print(insert_values)
                 manager.execute(cls._DARBAJA_INSERT, insert_values)
-                print("Eliminando trabajador de tabla trabajador $$:")
-                print(trabajador_values[0])
+                # print("Eliminando trabajador de tabla trabajador $$:")
+                # print(trabajador_values[0])
                 manager.execute(cls._DARBAJA_DELETE, (trabajador_values[0],))
             
-            print("Trabajador dado de baja exitosamente")
+            # print("Trabajador dado de baja exitosamente")
             
         except Exception as e:
             raise e
@@ -199,6 +202,10 @@ class TrabajadorDAO:
                 
             #Hashear la clave
             clave_salt, clave_hashed = hash_password(trabajador.clave)
+
+            # Crear datos trabajador
+            id_datos_trabajador = DatosTrabajadorDAO.crear_datos_trabajador()
+            time.sleep(1.5)
             
             values = (trabajador.nombre_usuario,
                     clave_hashed,
@@ -211,7 +218,10 @@ class TrabajadorDAO:
                     trabajador.genero,
                     trabajador.telefono,
                     trabajador.direccion,
-                    trabajador.tipo_usuario)
+                    trabajador.tipo_usuario,
+                    id_datos_trabajador,)
+            
+            
             with manejadorBD() as manager:
                 manager.execute(cls._INSERT, values)
                 return manager.rowcount
@@ -221,6 +231,15 @@ class TrabajadorDAO:
     @classmethod
     def update(cls, trabajador):
         pass
+
+    @classmethod
+    def alternar_modificacion_ficha(cls, trabajador):
+        try:
+            with manejadorBD() as manager:
+                manager.execute(cls._UPDATE_MODIFICARFICHA, (not trabajador.modificacion_bloqueada, trabajador.id_usuario))
+                return manager.rowcount
+        except Exception as e:
+            raise e
 
     @classmethod
     def get(cls, nombre_usuario) -> Trabajador:
@@ -324,3 +343,17 @@ class TrabajadorDAO:
                 return manager.rowcount
         except Exception as e:
             raise e
+    
+    @classmethod
+    def get_datostrabajador(cls, usuario):
+        try:
+            with manejadorBD() as manager:
+                manager.execute(cls._SELECTID, (usuario.id_usuario,))
+                data = manager.fetchone()
+                if data:
+                    return data[13]
+                else:
+                    return None
+        except Exception as e:
+            raise e
+    

@@ -54,7 +54,6 @@ def menuPrincipal():
                 
             if valor: 
                 try:
-                    print("valor:",valor)
                     menu.menuInicioSesion()
                 except Exception as e:
                     valor = False
