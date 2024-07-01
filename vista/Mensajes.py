@@ -64,6 +64,10 @@ class Mensaje():
     def pregunta_clave(self):
         print(f"\n{AMARILLO}[?] Ingresa tu contraseña: {Style.RESET_ALL}    [ENTER para salir]")
         return pwinput.pwinput(f"{separador}", mask="*")
+
+    def confirmar_clave(self):
+        print(f"\n{AMARILLO}[?] Confirma nuevamente tu contraseña: {Style.RESET_ALL}    [ENTER para salir]")
+        return pwinput.pwinput(f"{separador}", mask="*")
     
     def opcion_invalida(self):
         Mensaje(ADVERTENCIA, "Opción no válida, intente de nuevo...\n")
@@ -222,6 +226,31 @@ class MenuInterno:
                     Mensaje(ADVERTENCIA, "Opción no válida, intente de nuevo...")
                     esperar(0.5)
                     continue
+    @classmethod
+    def modificarMiContrasena(self, usuario: Trabajador):
+        while True:
+            nueva_clave = Mensaje().pregunta_clave()
+            if nueva_clave == "":
+                Mensaje(INFO, "Volviendo al menú principal...")
+                esperar(0.5)
+                return
+            confirma_clave = Mensaje().confirmar_clave()
+            if confirma_clave == "":
+                Mensaje(INFO, "Volviendo al menú principal...")
+                esperar(0.5)
+                return
+
+            if TrabajadorDAO.validar_clave(nueva_clave, confirma_clave):
+                TrabajadorDAO.cambiar_clave(usuario, nueva_clave)
+                Mensaje(EXITO, "Contraseña modificada con éxito!")
+                esperar(1)
+                return
+            else:
+                Mensaje(ADVERTENCIA, "Las contraseñas no coinciden, intente de nuevo...")
+                esperar(0.5)
+                continue
+            
+                
     @classmethod
     def modificarDatosPersonales(self, usuario: Trabajador):
         
@@ -623,7 +652,7 @@ class MenuInterno:
             pregunta = Mensaje().pregunta("Escoge una opción: ")
             if pregunta == "1":
                 # Modificar contraseña
-                esperar(2)
+                self.modificarMiContrasena(usuario)
             elif pregunta == "2":
                 # Modificar datos personales
                 self.modificarDatosPersonales(usuario)

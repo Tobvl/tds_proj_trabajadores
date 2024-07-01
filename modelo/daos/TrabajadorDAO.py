@@ -55,6 +55,11 @@ class TrabajadorDAO:
     _UPDATE_DIRECCION = 'UPDATE trabajador SET direccion=%s WHERE id_usuario=%s'
     _UPDATE_RUN_RUN = 'UPDATE trabajador SET run=%s WHERE id_usuario=%s'
     _UPDATE_RUN_DF = 'UPDATE trabajador SET rundf=%s WHERE id_usuario=%s'
+
+    _UPDATE_CLAVE = 'UPDATE trabajador SET clave=%s WHERE id_usuario=%s'
+    _UPDATE_CLAVESALT = 'UPDATE trabajador SET clave_salt=%s WHERE id_usuario=%s'
+    
+    
     _DELETE = 'DELETE FROM trabajador WHERE id_usuario=%s'
 
     _DARBAJA_DELETE = 'DELETE FROM trabajador WHERE id_usuario=%s'
@@ -99,6 +104,28 @@ class TrabajadorDAO:
             
         except Exception as e:
             raise e
+        
+    @classmethod
+    def validar_clave(cls, clave, clave_confirmacion):
+        if len(clave) < 4:
+            return False
+        if clave != clave_confirmacion:
+            return False
+        return True
+
+    @classmethod
+    def cambiar_clave(cls, usuario, clave):
+
+        salt, clave = hash_password(clave)
+        try:
+            with manejadorBD() as manager:
+                manager.execute(cls._UPDATE_CLAVE, (clave, int(usuario.id_usuario)))
+                manager.execute(cls._UPDATE_CLAVESALT, (salt, int(usuario.id_usuario)))
+                # print("Clave modificada exitosamente")
+                return manager.rowcount
+        except Exception as e:
+            raise e
+        
     
     @classmethod
     def validar_usuario(cls, nombre_usuario, clave):
